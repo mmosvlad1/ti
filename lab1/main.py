@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 
 def calculate_random_entropy():
-    random_sequence = [1, 1, 1, 1, 1]
+    random_sequence = np.random.randint(0, 5, np.random.randint(10, 21))
     print(random_sequence)
     random_entropy = scipy_entropy(random_sequence, base=2)
     return random_entropy
@@ -18,7 +18,7 @@ def calculate_entropy_value():
 
 
 def calculate_image_entropy(image_path):
-    image = cv2.imread(image_path, cv2.IMREAD_COLOR)
+    image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
     entropy_scipy = scipy_entropy(image.flatten(), base=2)
     hist = cv2.calcHist([image], [0], None, [256], [0, 256])
     hist = hist.astype(int)
