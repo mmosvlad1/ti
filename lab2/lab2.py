@@ -38,12 +38,22 @@ def quant(img_path, *quant_levels):
             cv2.waitKey(0)
 
 
-def restore():
+def restore(img_path):
     for level, img in disc_images.items():
         if level != 1:
-            restored_image = cv2.resize(img, (width, height), interpolation=cv2.INTER_LINEAR)
-            cv2.imwrite(f'restored_{level}_level.jpg', restored_image)
-            cv2.imshow(f'restored {level} level', restored_image)
+            nearest_restored = cv2.resize(img, (width, height), interpolation=cv2.INTER_NEAREST)
+            bilinear_restored = cv2.resize(img, (width, height), interpolation=cv2.INTER_LINEAR)
+            bicubic_restored = cv2.resize(img, (width, height), interpolation=cv2.INTER_CUBIC)
+
+            cv2.imwrite(f'nearest_restored_{level}_level_{img_path}', nearest_restored)
+            cv2.imwrite(f'bilinear_restored_{level}_level{img_path}', bilinear_restored)
+            cv2.imwrite(f'bicubic_restored_{level}_level{img_path}', bicubic_restored)
+
+            cv2.imshow(f'nearest_restored {level} level', nearest_restored)
+            cv2.waitKey(0)
+            cv2.imshow(f'bilinear_restored {level} level', bilinear_restored)
+            cv2.waitKey(0)
+            cv2.imshow(f'bicubic_restored {level} level', bicubic_restored)
             cv2.waitKey(0)
 
 
@@ -57,7 +67,7 @@ if __name__ == "__main__":
     disc_images = {}
     disc(image, image_path, 2, 2, 4)
     quant(image_path, 8, 16, 64)
-    restore()
+    restore(image_path)
 
 
 
