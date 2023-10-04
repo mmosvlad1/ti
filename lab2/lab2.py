@@ -1,6 +1,11 @@
 import cv2
 import numpy as np
-from scipy.stats import entropy as scipy_entropy
+
+
+def entropy(img):
+    histogram = cv2.calcHist([img], [0], None, [256], [0, 256])
+    histogram /= histogram.sum()
+    return -np.sum(histogram * np.log2(histogram + np.finfo(float).eps))
 
 
 def disc(img, img_path, step, *desc_levels):
@@ -17,7 +22,7 @@ def disc(img, img_path, step, *desc_levels):
         disc_images[level] = discretized_image
 
     for level, discretized in disc_images.items():
-        img_entropy = scipy_entropy(discretized.flatten(), base=2)
+        img_entropy = entropy(discretized)
         print(f"Discretized {level} levels, entropy = {img_entropy}")
         cv2.imwrite(f'disc_{level}_{img_path}', discretized)
         cv2.imshow(f'Discretized {level} levels', discretized)
@@ -25,13 +30,13 @@ def disc(img, img_path, step, *desc_levels):
 
 
 def quant(img_path, *quant_levels):
-    entropy = scipy_entropy(image.flatten(), base=2)
+    org_entropy = entropy(image)
     for levels in quant_levels:
         for level, img in disc_images.items():
             quantized = (img // (256 // levels)) * (256 // levels)
-            img_entropy = scipy_entropy(quantized.flatten(), base=2)
+            img_entropy = entropy(quantized)
             print(f"Discretized {level} levels, quantized {levels} levels,"
-                  f" entropy = {img_entropy}, relative entropy = {entropy - img_entropy}")
+                  f" entropy = {img_entropy}, relative entropy = {org_entropy - img_entropy}")
 
             cv2.imwrite(f'disc_{level}_quantized_{levels}_{img_path}', quantized)
             cv2.imshow(f'Disc {level} levels, quantized {levels} levels', quantized)
@@ -68,8 +73,3 @@ if __name__ == "__main__":
     disc(image, image_path, 2, 2, 4)
     quant(image_path, 8, 16, 64)
     restore(image_path)
-
-
-
-
-
