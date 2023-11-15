@@ -1,8 +1,7 @@
 import random
 import string
+
 from graphviz import Digraph
-import matplotlib.pyplot as plt
-import networkx as nx
 
 
 def generate_random_words():
@@ -12,7 +11,7 @@ def generate_random_words():
         word_length = random.randint(3, 10)
         word = ''.join(random.choice(string.ascii_lowercase) for _ in range(word_length))
         words.append(word)
-    return ' '.join(words)
+    return '_'.join(words)
 
 
 def dictionary_tree(dictionary_output, filename="dictionary_tree"):
@@ -27,28 +26,6 @@ def dictionary_tree(dictionary_output, filename="dictionary_tree"):
 
     dot.render(filename, cleanup=True, format='png', engine='dot')
     print(f"Dictionary tree saved as '{filename}.png'")
-
-
-# def build_tree(dictionary_output):
-#     G = nx.DiGraph()
-#
-#     for code, phrase in dictionary_output:
-#         G.add_node(code, label=phrase)
-#
-#     for i in range(len(dictionary_output) - 1):
-#         G.add_edge(dictionary_output[i][0], dictionary_output[i + 1][0], label=dictionary_output[i + 1][1][-1])
-#
-#     return G
-#
-#
-# def draw_dictionary_tree(graph, filename="dictionary_tree"):
-#     pos = nx.spring_layout(graph)
-#     labels = nx.get_edge_attributes(graph, 'label')
-#     nx.draw(graph, pos, with_labels=True, labels=nx.get_node_attributes(graph, 'label'), node_size=700, node_color='skyblue', font_size=8, font_color='black')
-#     nx.draw_networkx_edge_labels(graph, pos, edge_labels=labels, font_color='red', font_size=8)
-#
-#     plt.savefig(f"{filename}.png")
-#     plt.show()
 
 
 def build_tree(dictionary_output):
@@ -127,21 +104,10 @@ class LZ78:
         return total_length / total_count if total_count > 0 else 0
 
 
-def print_table(dict, comp):
-    for i in dict:
-        print(i[1])
-
-    print('\n\n -----------------------------\n\n')
-
-    for i in comp:
-        print(i)
-
-
 if __name__ == "__main__":
-    sequence_1 = "sir_sid_eastman_easily_teases_sea_sick_seals"
-    # sequence_1 = "moskalmoskal"
-    sequence_2 = ("Get clear definitions and audio pronunciations of words, phrases, and idioms in British and American"
-                  "English from the three most popular Cambridge dictionaries of English with just one search")
+    sequence_1 = "moskalmoskal"
+    sequence_2 = ("Get_clear_definitions_and_audio_pronunciations_of_words_phrases_and_idioms_in_British_and_American"
+                  "_English_from_the_three_most_popular_Cambridge_dictionaries_of_English_with_just_one_search")
     sequence_3 = generate_random_words()
 
     lz1 = LZ78()
@@ -176,10 +142,5 @@ if __name__ == "__main__":
     print("Dictionary (during decompression) 2:", dictionary_decompress_2)
     print("Dictionary (during decompression) 3:", dictionary_decompress_3)
 
-    # dictionary_tree(dictionary_compress_1, "dict_tree_1")
-    # draw_dictionary_tree(dictionary_compress_2, "dictionary_tree_2")
-    draw_dictionary_tree(build_tree(dictionary_compress_1), "dictionary_tree_1")
-    draw_dictionary_tree(build_tree(dictionary_compress_2), "dictionary_tree_2")
-
-    print_table(dictionary_compress_1, compressed_data_1)
-
+    dictionary_tree(dictionary_compress_1, "dict_tree_1")
+    dictionary_tree(dictionary_compress_2, "dict_tree_2")
