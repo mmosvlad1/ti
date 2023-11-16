@@ -1,7 +1,9 @@
 import random
 import string
+from math import ceil
 
-from graphviz import Digraph
+import graphviz
+from treelib import Tree
 
 
 def generate_random_words():
@@ -12,38 +14,6 @@ def generate_random_words():
         word = ''.join(random.choice(string.ascii_lowercase) for _ in range(word_length))
         words.append(word)
     return '_'.join(words)
-
-
-def dictionary_tree(dictionary_output, filename="dictionary_tree"):
-    dot = Digraph(comment='LZ78 Dictionary Tree')
-    dot.format = 'png'
-
-    for code, phrase in dictionary_output:
-        dot.node(str(code), phrase)
-
-    for i in range(len(dictionary_output) - 1):
-        dot.edge(str(dictionary_output[i][0]), str(dictionary_output[i + 1][0]), label=dictionary_output[i + 1][1][-1])
-
-    dot.render(filename, cleanup=True, format='png', engine='dot')
-    print(f"Dictionary tree saved as '{filename}.png'")
-
-
-def build_tree(dictionary_output):
-    dot = Digraph(comment='LZ78 Dictionary Tree')
-
-    for code, phrase in dictionary_output:
-        dot.node(str(code), phrase)
-
-    for i in range(len(dictionary_output) - 1):
-        edge_label = dictionary_output[i + 1][1][-1]
-        dot.edge(str(dictionary_output[i][0]), str(dictionary_output[i + 1][0]), label=edge_label, fontsize='8')
-
-    return dot
-
-
-def draw_dictionary_tree(dot, filename="dictionary_tree"):
-    dot.render(filename, cleanup=True, format='png', engine='dot')
-    print(f"Dictionary tree saved as '{filename}.png'")
 
 
 class LZ78:
@@ -101,7 +71,32 @@ class LZ78:
             total_length += len(bin(code)[2:])
             total_count += 1
 
-        return total_length / total_count if total_count > 0 else 0
+        return ceil(total_length / total_count) if total_count > 0 else 0
+
+
+def show_tree(compressed, name):
+    tree = Tree()
+    tree.create_node("Root", "0")
+
+    for i in range(len(compressed)):
+        symbol = compressed[i][1]
+        parent_index = str(compressed[i][0])
+        tree.create_node(f"{symbol} ({i})", f"{i + 1}", parent=parent_index)
+
+    tree.show()
+
+    dot = graphviz.Digraph(comment='Tree Visualization')
+
+    for node in tree.all_nodes():
+        if node.identifier != '0':
+            parent_node = tree.parent(node.identifier)
+            dot.node(node.identifier, node.tag)
+            dot.edge(parent_node.identifier, node.identifier)
+
+    dot.attr(rankdir='LR')
+    dot.attr(ratio='fill')
+
+    dot.render(f"tree_visualization{name}", view=True)
 
 
 if __name__ == "__main__":
@@ -142,5 +137,5 @@ if __name__ == "__main__":
     print("Dictionary (during decompression) 2:", dictionary_decompress_2)
     print("Dictionary (during decompression) 3:", dictionary_decompress_3)
 
-    dictionary_tree(dictionary_compress_1, "dict_tree_1")
-    dictionary_tree(dictionary_compress_2, "dict_tree_2")
+    show_tree(dictionary_compress_1, '1')
+    show_tree(dictionary_compress_2, '2')
