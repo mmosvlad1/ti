@@ -1,18 +1,37 @@
 import numpy as np
 
-probabilities = np.array([[0.105, 0.025, 0.120],
-                          [0.030, 0.175, 0.060],
-                          [0.015, 0.050, 0.420]])
+p_xy = np.array([[0.105, 0.025, 0.120],
+                 [0.030, 0.175, 0.060],
+                 [0.015, 0.050, 0.420]])
 
 
-# Середня кількість інформації I(Y, X)
-def information_content(probabilities):
-    return -np.sum(probabilities * np.log2(probabilities))
+def entropy(p):
+    return -np.sum(p * np.log2(p))
 
 
-average_information = information_content(probabilities)
-print(f"Середня кількість інформації: {average_information:.4f} біт")
+def p_x():
+    return np.sum(p_xy, axis=0)
 
-# Інформаційна пропускна здатність C
-max_information = np.max(np.sum(probabilities, axis=0))
-print(f"Інформаційна пропускна здатність: {max_information:.4f} біт")
+
+def p_y():
+    return np.sum(p_xy, axis=1)
+
+
+def p_y_given_x():
+    return p_xy / p_x()
+
+
+def mutual_information():
+    return entropy(p_x()) + entropy(p_y()) - entropy(p_xy)
+
+
+def max_information_y():
+    return np.log2(p_xy.shape[1])
+
+
+def capacity():
+    return max_information_y() - entropy(p_y_given_x()[0])
+
+
+print(f"Взаємна інформація: {mutual_information()}")
+print(f"Пропускна здатність каналу: {capacity()}")
